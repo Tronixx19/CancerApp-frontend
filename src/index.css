@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #f8fafc; /* Un fondo gris casi blanco para que la app no lastime la vista */
+}
