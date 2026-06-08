@@ -50,7 +50,7 @@ const Upload: Component = () => {
       const formData = new FormData();
       formData.append("file", currentFile); // "file" es la palabra clave que FastAPI espera
 
-      const response = await fetch("http://localhost:8000/predict", {
+      const response = await fetch("https://tronixx19-cancerapp-api.hf.space/predict", {
         method: "POST",
         body: formData,
       });
