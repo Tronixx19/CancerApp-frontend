@@ -7,7 +7,7 @@ import { supabase } from "../lib/supabase";
 
 interface PerfilClinico {
   edad?: number;
-  genero?: string;
+  sexo_biologico?: string;
   habitos_cancerigenos?: string[];
 }
 
@@ -20,11 +20,9 @@ const ETIQUETAS_TIEMPO: Record<string, string> = {
   no_recuerda: "No lo recuerda con exactitud",
 };
 
-const ETIQUETAS_GENERO: Record<string, string> = {
+const ETIQUETAS_SEXO: Record<string, string> = {
   masculino: "Masculino",
   femenino: "Femenino",
-  no_binario: "No binario",
-  prefiero_no_decir: "Prefiero no decir",
 };
 
 const ETIQUETAS_HABITOS: Record<string, string> = {
@@ -64,7 +62,12 @@ const Results: Component = () => {
         const meta = data.user.user_metadata;
         setPerfil({
           edad: typeof meta.edad === "number" ? meta.edad : Number(meta.edad) || undefined,
-          genero: typeof meta.genero === "string" ? meta.genero : undefined,
+          sexo_biologico:
+            typeof meta.sexo_biologico === "string"
+              ? meta.sexo_biologico
+              : typeof meta.genero === "string"
+              ? meta.genero
+              : undefined,
           habitos_cancerigenos: Array.isArray(meta.habitos_cancerigenos)
             ? meta.habitos_cancerigenos
             : [],
@@ -80,10 +83,10 @@ const Results: Component = () => {
     return ETIQUETAS_TIEMPO[state.tiempoLesion] ?? state.tiempoLesion;
   });
 
-  const generoTexto = createMemo(() => {
-    const g = perfil()?.genero;
-    if (!g) return "No especificado";
-    return ETIQUETAS_GENERO[g] ?? g;
+  const sexoTexto = createMemo(() => {
+    const s = perfil()?.sexo_biologico;
+    if (!s) return "No especificado";
+    return ETIQUETAS_SEXO[s] ?? s;
   });
 
   const habitosFormateados = createMemo(() => {
@@ -188,10 +191,10 @@ const Results: Component = () => {
             </Show>
           </div>
 
-          {/* Antecedentes y datos del usuario (sin correo ni contraseña) */}
+          {/* Antecedentes y datos clínicos del usuario */}
           <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 space-y-3 transition-colors">
             <h3 class="text-sm font-bold flex items-center gap-2 text-slate-800 dark:text-white">
-              <User size={18} class="text-medical" /> Datos y factores de riesgo del usuario
+              <User size={18} class="text-medical" /> Antecedentes clínicos del usuario
             </h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700 dark:text-slate-300">
               <div>
@@ -201,8 +204,8 @@ const Results: Component = () => {
                 </span>
               </div>
               <div>
-                <span class="text-slate-500 dark:text-slate-400">Género: </span>
-                <span class="font-medium">{generoTexto()}</span>
+                <span class="text-slate-500 dark:text-slate-400">Sexo biológico: </span>
+                <span class="font-medium">{sexoTexto()}</span>
               </div>
             </div>
             <div class="text-sm text-slate-700 dark:text-slate-300">

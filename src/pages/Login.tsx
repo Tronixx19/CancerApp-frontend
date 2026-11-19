@@ -18,7 +18,7 @@ const Login = () => {
 
   // Campos clínicos de registro
   const [edad, setEdad] = createSignal<string>("");
-  const [genero, setGenero] = createSignal<string>("");
+  const [sexoBiologico, setSexoBiologico] = createSignal<string>("");
   const [habitos, setHabitos] = createSignal<string[]>([]);
   const [otroHabito, setOtroHabito] = createSignal("");
 
@@ -74,8 +74,8 @@ const Login = () => {
       return;
     }
 
-    if (!genero()) {
-      setMensaje("❌ Selecciona tu género");
+    if (!sexoBiologico()) {
+      setMensaje("❌ Selecciona tu sexo biológico");
       return;
     }
 
@@ -92,7 +92,7 @@ const Login = () => {
       options: {
         data: {
           edad: edadNum,
-          genero: genero(),
+          sexo_biologico: sexoBiologico(),
           habitos_cancerigenos: listaFinalHabitos,
         },
       },
@@ -117,7 +117,7 @@ const Login = () => {
           <h2 class="text-2xl font-bold text-slate-800">CancerApp</h2>
           <p class="text-sm text-slate-500">
             {modoRegistro()
-              ? "Completa tus datos para crear tu cuenta"
+              ? "Completa tus datos clínicos para crear tu cuenta"
               : "Inicia sesión para continuar con tu análisis"}
           </p>
         </div>
@@ -167,22 +167,20 @@ const Login = () => {
                 />
               </div>
 
-              {/* Género */}
+              {/* Sexo biológico */}
               <div class="relative">
                 <Users size={20} class="absolute left-3 top-3.5 text-slate-400" />
                 <select
-                  value={genero()}
-                  onChange={(e) => setGenero(e.currentTarget.value)}
+                  value={sexoBiologico()}
+                  onChange={(e) => setSexoBiologico(e.currentTarget.value)}
                   class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-medical focus:bg-white transition-all text-slate-700"
                   required
                 >
                   <option value="" disabled>
-                    Selecciona tu género
+                    Selecciona sexo biológico
                   </option>
                   <option value="masculino">Masculino</option>
                   <option value="femenino">Femenino</option>
-                  <option value="no_binario">No binario</option>
-                  <option value="prefiero_no_decir">Prefiero no decir</option>
                 </select>
               </div>
 
