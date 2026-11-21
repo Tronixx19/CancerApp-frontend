@@ -45,6 +45,7 @@ const Results: Component = () => {
     | {
         diagnostico?: string;
         confianza?: number;
+        consenso?: string;
         tiempoLesion?: string;
         detalleLesion?: string;
       }
@@ -106,9 +107,9 @@ const Results: Component = () => {
         iconBg: "bg-white/30",
         confidence: confidencePercent,
         description:
-          "La Inteligencia Artificial ha detectado características y patrones visuales que sugieren la posible presencia de tejido anómalo o maligno. Requiere atención médica prioritaria.",
+          "El modelo de clasificación identificó patrones visuales compatibles con tejido anómalo o potencialmente maligno a nivel global de imagen (sin segmentación anatómica ni hallazgos morfológicos individuales).",
         recommendation:
-          "Agendar una cita de URGENCIA con un especialista (Odontólogo o Maxilofacial) para realizar una evaluación clínica y/o biopsia confirmatoria.",
+          "Agendar una cita de URGENCIA con un especialista (Odontólogo o Maxilofacial) para realizar una evaluación clínica presencial y/o biopsia confirmatoria.",
       };
     } else {
       return {
@@ -117,7 +118,7 @@ const Results: Component = () => {
         iconBg: "bg-white/30",
         confidence: confidencePercent,
         description:
-          "La Inteligencia Artificial no ha detectado patrones visuales evidentes de malignidad en la imagen proporcionada. El tejido tiene un aspecto mayoritariamente regular.",
+          "El modelo de clasificación no identificó patrones visuales predominantes de malignidad en la fotografía analizada (sin evaluación morfológica localizada ni diagnóstico clínico).",
         recommendation:
           "Mantener rutinas de higiene oral. Si presenta dolor, sangrado, o si la lesión no desaparece en 14 días, consulte a su odontólogo preventivamente.",
       };
@@ -165,7 +166,10 @@ const Results: Component = () => {
           </div>
           <div>
             <h2 class="text-2xl font-bold">Nivel de Riesgo: {resultData().riskLevel}</h2>
-            <p class="opacity-90 font-medium">Confianza de la IA: {resultData().confidence}</p>
+            <p class="opacity-90 font-medium">
+              Confianza de la IA: {resultData().confidence}
+              {state.consenso ? ` · Consenso de pasadas: ${state.consenso}` : ""}
+            </p>
           </div>
         </div>
 
@@ -173,8 +177,8 @@ const Results: Component = () => {
           <div class="flex items-start gap-3 p-4 bg-orange-50 dark:bg-orange-900/20 text-orange-800 dark:text-orange-300 rounded-xl border border-orange-200 dark:border-orange-800/50 transition-colors">
             <AlertTriangle class="shrink-0 mt-0.5" size={20} />
             <p class="text-sm">
-              <strong>Aviso Médico:</strong> Este análisis es generado por Inteligencia Artificial con fines informativos.{" "}
-              <strong>No sustituye</strong> un diagnóstico médico profesional. Consulte siempre a un especialista en salud oral.
+              <strong>Aviso Médico:</strong> Este análisis es generado por Inteligencia Artificial con fines informativos de triaje preliminar.{" "}
+              <strong>No sustituye</strong> un diagnóstico médico profesional ni entrega hallazgos morfológicos localizados. Consulte siempre a un especialista en salud oral.
             </p>
           </div>
 
@@ -227,7 +231,7 @@ const Results: Component = () => {
           <div class="space-y-4 text-slate-700 dark:text-slate-300">
             <div>
               <h3 class="text-lg font-bold flex items-center gap-2 text-slate-800 dark:text-white mb-2">
-                <Info size={20} class="text-medical" /> Hallazgos Clínicos
+                <Info size={20} class="text-medical" /> Síntesis de Inferencia y Contexto Clínico
               </h3>
               <p class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700 transition-colors">
                 {resultData().description}

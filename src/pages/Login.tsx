@@ -1,5 +1,16 @@
 import { createSignal, For, Show } from "solid-js";
-import { Mail, Lock, LogIn, UserPlus, ShieldAlert, Calendar, Users, Flame } from "lucide-solid";
+import {
+  Mail,
+  Lock,
+  LogIn,
+  UserPlus,
+  ShieldAlert,
+  Calendar,
+  Users,
+  Flame,
+  FileText,
+  X,
+} from "lucide-solid";
 import { useNavigate } from "@solidjs/router";
 import { supabase } from "../lib/supabase";
 
@@ -16,11 +27,13 @@ const Login = () => {
   const [password, setPassword] = createSignal("");
   const [modoRegistro, setModoRegistro] = createSignal(false);
 
-  // Campos clínicos de registro
+  // Campos clínicos y consentimiento de registro
   const [edad, setEdad] = createSignal<string>("");
   const [sexoBiologico, setSexoBiologico] = createSignal<string>("");
   const [habitos, setHabitos] = createSignal<string[]>([]);
   const [otroHabito, setOtroHabito] = createSignal("");
+  const [aceptoTerminos, setAceptoTerminos] = createSignal(false);
+  const [mostrarTerminos, setMostrarTerminos] = createSignal(false);
 
   const [loading, setLoading] = createSignal(false);
   const [mensaje, setMensaje] = createSignal("");
@@ -79,6 +92,11 @@ const Login = () => {
       return;
     }
 
+    if (!aceptoTerminos()) {
+      setMensaje("❌ Debes aceptar los Términos de Uso y Política de Protección de Datos");
+      return;
+    }
+
     setLoading(true);
     setMensaje("");
 
@@ -94,6 +112,8 @@ const Login = () => {
           edad: edadNum,
           sexo_biologico: sexoBiologico(),
           habitos_cancerigenos: listaFinalHabitos,
+          acepto_terminos: true,
+          fecha_aceptacion_terminos: new Date().toISOString(),
         },
       },
     });
@@ -103,6 +123,7 @@ const Login = () => {
     } else {
       setMensaje("✅ ¡Cuenta creada! Ya puedes iniciar sesión.");
       setModoRegistro(false);
+      setAceptoTerminos(false);
     }
     setLoading(false);
   };
@@ -117,7 +138,7 @@ const Login = () => {
           <h2 class="text-2xl font-bold text-slate-800">CancerApp</h2>
           <p class="text-sm text-slate-500">
             {modoRegistro()
-              ? "Completa tus datos clínicos para crear tu cuenta"
+              ? "Completa tus datos clínicos y acepta los términos"
               : "Inicia sesión para continuar con tu análisis"}
           </p>
         </div>
@@ -216,6 +237,31 @@ const Login = () => {
                   </Show>
                 </div>
               </div>
+
+              {/* Consentimiento de protección de datos y términos */}
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                <label class="flex items-start gap-2.5 text-xs text-slate-700 cursor-pointer leading-relaxed">
+                  <input
+                    type="checkbox"
+                    checked={aceptoTerminos()}
+                    onChange={(e) => setAceptoTerminos(e.currentTarget.checked)}
+                    class="mt-0.5 rounded border-slate-300 text-medical focus:ring-medical shrink-0"
+                    required
+                  />
+                  <span>
+                    Acepto que mi información de cuenta y antecedentes (correo, edad, sexo biológico y hábitos) se almacenen conforme a la normativa de protección de datos, y entiendo que{" "}
+                    <strong>las imágenes no se guardan en ninguna base de datos</strong>.
+                  </span>
+                </label>
+
+                <button
+                  type="button"
+                  onClick={() => setMostrarTerminos(true)}
+                  class="inline-flex items-center gap-1.5 text-xs font-semibold text-medical hover:underline"
+                >
+                  <FileText size={14} /> Leer Términos de Uso y Privacidad
+                </button>
+              </div>
             </div>
           </Show>
 
@@ -272,6 +318,51 @@ const Login = () => {
           </div>
         </form>
       </div>
+
+      {/* Modal de Términos de Uso y Protección de Datos */}
+      <Show when={mostrarTerminos()}>
+        <div class="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4">
+          <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 space-y-4 border border-slate-200">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                <FileText size={18} class="text-medical" /> Términos de Uso y Protección de Datos
+              </h3>
+              <button
+                type="button"
+                onClick={() => setMostrarTerminos(false)}
+                class="text-slate-400 hover:text-slate-700"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div class="text-xs text-slate-600 space-y-2.5 max-h-64 overflow-y-auto leading-relaxed">
+              <p>
+                <strong>1. Finalidad orientativa:</strong> Esta aplicación realiza un triaje preliminar asistido por inteligencia artificial y no constituye un diagnóstico médico definitivo ni reemplaza la evaluación odontológica o médica presencial.
+              </p>
+              <p>
+                <strong>2. Datos personales almacenados:</strong> Al crear tu cuenta, se almacenan tus credenciales de acceso, edad, sexo biológico y hábitos declarados para fines de perfil y generación de reportes, bajo los principios de licitud, finalidad y minimización de datos de la normativa de protección de datos personales.
+              </p>
+              <p>
+                <strong>3. Privacidad de las imágenes:</strong> Las fotografías de lesiones orales se procesan exclusivamente en memoria volátil durante la inferencia y <strong>no se almacenan</strong> en bases de datos ni en repositorios persistentes tras el análisis.
+              </p>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => {
+                  setAceptoTerminos(true);
+                  setMostrarTerminos(false);
+                }}
+                class="px-4 py-2 text-xs font-semibold rounded-xl bg-medical text-white hover:bg-medical-dark transition-colors"
+              >
+                Aceptar y cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      </Show>
     </div>
   );
 };

@@ -53,12 +53,13 @@ const Upload: Component = () => {
       // Envío directo en memoria a FastAPI (sin almacenamiento persistente en BD)
       const formData = new FormData();
       formData.append("file", currentFile);
+      formData.append("num_passes", "5");
       formData.append("lesion_duration", tiempoLesion());
       if (detalleLesion().trim()) {
         formData.append("lesion_notes", detalleLesion().trim());
       }
 
-      const response = await fetch("https://tronixx19-cancerapp-api.hf.space/predict", {
+      const response = await fetch("http://localhost:8000/predict", {
         method: "POST",
         body: formData,
       });
@@ -81,6 +82,7 @@ const Upload: Component = () => {
           state: {
             diagnostico: iaData.prediction,
             confianza: iaData.confidence_score,
+            consenso: iaData.consensus_votes,
             tiempoLesion: tiempoLesion(),
             detalleLesion: detalleLesion().trim(),
           },
